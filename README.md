@@ -82,3 +82,4 @@ Y ahora si que pasan los 3 test correctament
 
 # 3. Class-based Test
 - 1 Creamos el archivo `shapes.py` en la carpeta source
+- lfkgañlfgñladfg
