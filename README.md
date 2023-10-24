@@ -81,5 +81,69 @@ Y ahora si que pasan los 3 test correctament
 <a name="schema3"></a>
 
 # 3. Class-based Test
-- 1 Creamos el archivo `shapes.py` en la carpeta source
-- lfkgañlfgñladfg
+- 1 Creamos el archivo `shapes.py` en la carpeta source. Con una clase shape y creamos una clase círculo
+```
+import math
+
+class Shape:
+    def area(self):
+        pass
+    def perimeter(self):
+        pass
+
+class Circle(Shape):
+        def __init__(self,radius):
+            self.radius = radius
+
+        def area(self):
+            return math.pi * self.radius ** 2
+
+        def perimeter(self):
+            return 2*math.pi *self.radius
+```
+- 2 Creamos el archivo de test `test_circle.py`, es bueno que el archivo de test tenga un nombre con el que podamos
+saber a que archivo le va hacer test.
+```
+import pytest
+import source.shapes as shapes
+
+class TestCircle:
+    def test_one(self):
+        assert True
+```
+![test](./img/test4.png)
+
+- 3 Creamos dos funciones nuevas, `setup_method` y `teardown_method`.
+  - La primera se ejecuta antes de que comience la prueba y se usa para realizar configuraciones o preparaciones antes 
+de una prueba
+  - La segunda se ejecuta una después que se ejecute la prueba y se utiliza por lo general para realizar limpieza o 
+liberar recursos después de que las pruebas se hayan ejecutado.
+  ```
+    import source.shapes as shapes
+    import math
+
+
+  class TestCircle:
+
+    def setup_method(self,method):
+        print(f'Setting up {method}')
+        self.circle = shapes.Circle(10)
+
+    def teardown_method(self,method):
+        print(f'Tearing down {method}')
+        del self.circle
+
+    def test_area(self):
+        assert self.circle.area() == math.pi * self.circle.radius ** 2
+
+    def test_perimeter(self):
+        result = self.circle.perimeter()
+        expected = 2 * math.pi * self.circle.radius
+        assert result == expected
+  ```
+- 4 Para ver la ejecución de estas dos útlimas funciones usamos 
+  ```
+    pytest test/test_circle.py -s
+  ```
+  ![error](./img/test5.png)
+
