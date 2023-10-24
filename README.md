@@ -2,7 +2,7 @@
 - [1.- Install Pytest y crear conjunto de carpetas](#schema1)
 - [2.- Primera prueba](#schema2)
 - [3.- Class-based Test](#schema3)
-
+- [4.- Fixtures](#schema4)
 
 
 <a name="schema1"></a>
@@ -146,4 +146,57 @@ liberar recursos después de que las pruebas se hayan ejecutado.
     pytest test/test_circle.py -s
   ```
   ![error](./img/test5.png)
+
+
+<a name="schema4"></a>
+
+# 4. Fixtures
+- 1 Creamos otra clase, `Rectangle` dentro del archivo shapes
+```
+class Rectangle(Shape):
+    def __init__(self,length,width):
+        self.length = length
+        self.width = width
+        
+    def area(self):
+        return self.length * self.width
+    
+    def perimeter(self):
+        return (self.length * 2 ) + (self.width * 2)
+
+```
+- 2 Creamos un archivo test, `test_rectangle.py`.
+```
+import pytest
+import source.shapes as shapes
+import math
+
+def test_area():
+    rectangle = shapes.Rectangle(length=10, width=20)
+    assert rectangle.area() == 10 * 20
+
+def test_perimeter():
+    rectangle = shapes.Rectangle(length=10, width=20)
+    assert rectangle.perimeter() == (2*10) + (2*20)
+
+```
+Primer test pasado
+![test](./img/test6.png)
+
+Pero como vemos generamos dos rectángulos, para cambiarlo vamos a usar python fixtures.
+Quedando así el código. Con esto estamos creando un rectangulo que vamos a usar en las dos funciones siguientes.
+```
+@pytest.fixture
+def my_rectangle():
+    return shapes.Rectangle(length=10, width=20)
+
+
+def test_area(my_rectangle):
+    assert my_rectangle.area() == 10 * 20
+
+
+def test_perimeter(my_rectangle):
+    assert my_rectangle.perimeter() == (2*10) + (2*20)
+
+```
 
