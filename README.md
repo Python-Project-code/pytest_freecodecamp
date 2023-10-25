@@ -4,6 +4,7 @@
 - [3.- Class-based Test](#schema3)
 - [4.- Fixtures](#schema4)
 - [5. Mark & Parametrize](#schema5)
+- [6. Mocking](#schema6)
 
 
 <a name="schema1"></a>
@@ -301,3 +302,90 @@ def test_multiple_square_areas(side_length, expected_area):
 ![test](./img/test9.png)
 
 Como podemos ver hay 3 puntos que son las tres tuplas que hemos evaluado.
+
+
+<a name="schema6"></a>
+
+# 6. Mocking
+
+En esta parte vamos a crear objetos simulados (mocks) que actúen como funciones o métodos específicos. Esto te permite
+controlar lo que una función o método devuelve y cómo se comporta en una prueba sin necesidad de acceder a componontes
+externos o hacer llamadas a APIs reales. Por ejemplo, se puede simular una base de datos o una API web.
+
+Creamos un archivo nuevo `service.py` donde vamos a crear una base de datos dummy.
+## Base de datos, mock
+- 1º Creamos una base de datos dummy
+```
+database = {
+    1: "Alice",
+    2: "Bob",
+    3: "Charlie"
+}
+
+```
+
+- 2º Creamos las funciones necesarias.
+```
+def get_user_from_db(user_id):
+    return database.get(user_id)
+```
+- 3º Creamos el archivo `test_service.py`, donde creamos una función mock para testear.
+Lo primero que hace este código es reemplazar temporalmente una función o método en el código en este caso reemplazamos
+source.service.get_user_from_db por mock_get_user_from_db.
+
+mock_get_user_from_db.return_value = 'Mocked Alice': Aquí estás configurando el comportamiento del objeto 
+mock mock_get_user_from_db. Cuando la función get_user_from_db se llame durante la prueba, en lugar de ejecutar el 
+código real de source.service.get_user_from_db, se retornará el valor 'Mocked Alice'. Esto simula el comportamiento 
+esperado de la función en esta prueba.
+
+user_name = service.get_user_from_db(1): Estás llamando a la función get_user_from_db desde el módulo service, 
+que suponemos utiliza source.service.get_user_from_db. Sin embargo, debido al decorador @mock.patch, 
+en realidad se está utilizando el objeto mock mock_get_user_from_db en lugar de la función real.
+
+assert user_name == 'Mocked Alice': Finalmente, estás verificando que el resultado de llamar a get_user_from_db con el 
+argumento 1 sea igual a 'Mocked Alice', que es el valor configurado previamente en el objeto mock. 
+Si la prueba es exitosa, esto confirma que la función get_user_from_db en realidad se ha reemplazado por el mock y 
+que el código en service está utilizando el valor simulado.
+
+```
+import pytest
+import source.service as service
+import unittest.mock as mock
+
+@mock.patch("source.service.get_user_from_db")
+def test_get_user_from_db(mock_get_user_from_db):
+    mock_get_user_from_db.return_value = 'Mocked Alice'
+    user_name = service.get_user_from_db(1)
+    assert user_name == 'Mocked Alice'
+```
+
+## API, mock
+
+Instalamos librería requests
+```
+pip install requests
+
+```
+
+Añadimos este código a `service.py`, donde obtenemos unos datos mock de esa página.
+```
+def get_users():
+    reponse = requests.get('https://jsonplaceholder.typicode.com/users')
+    if reponse.status_code == 200:
+        return response.json()
+
+    raise requests.HTTPError
+```
+
+Y en `test_service.py`, añadimos esto.
+```
+@mock.patch("requests.get")
+def test_get_users(mock_get):
+    mock_response = mock.Mock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"id": 1, "name": "John Doe"}
+    mock_get.return_value = mock_response
+    data = service.get_users()
+    assert data == {"id": 1, "name": "John Doe"}
+
+```
