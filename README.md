@@ -3,6 +3,7 @@
 - [2.- Primera prueba](#schema2)
 - [3.- Class-based Test](#schema3)
 - [4.- Fixtures](#schema4)
+- [5. Mark & Parametrize](#schema5)
 
 
 <a name="schema1"></a>
@@ -222,3 +223,81 @@ Ejecutamos el y pasa correctamente  ya que las fixtures son globales. Para proba
 
 ```
 Y comrpobamos que sin añadar nada más la ejecución es correcta.
+
+<a name="schema5"></a>
+
+# 5. Mark & Parametrize
+- ## Mark
+El marcado en pytest se refiere a la capacidad de etiquetar o marcar pruebas para clasificarlas o personalizar su
+comportamiento.
+
+Vamos a usar los archivos `my_functions.py` y `test_my_functions.py`.
+
+Para este caso vamos a usar `mark.slow`, que se usar para marcar una prueba como lenta. Es útil para identificar y 
+manejar pruebas que consumen más tiempo que las pruebas típicas.
+Añadimos:
+
+```
+import time
+
+
+@pytest.mark.slow
+def test_very_slow():
+    time.sleep(5)
+    result = my_functions.divide(number_one=10, number_two=5)
+    assert result == 2
+
+```
+
+Paramos ver el resultado esos 5 segundos.
+
+Ahora probamos `skip`, para optimizar la ejecución de ciertas pruebas.
+
+```
+@pytest.mark.skip(reason="This feature is currently broken")
+def test_add():
+    assert my_functions.add(number_one=1,number_two=2) == 3
+```
+![test](./img/test7.png)
+
+Xfail, se usa cuando una prueba se espera que falle, pero queremos que se ejecute y registre el resultado de la prueba.
+Esta funcionalidad es útil en situacines donde una parte de tu código está rota o no funcionas como se espera, pero aún 
+deseas ejecutar otras partes de tus pruebas sin que se la prueba marcada como "esperada para fallar" cause una 
+interrupción.
+
+```
+@pytest.mark.xfail(reason="We know we cannot divide by zero")
+def test_divide_zero_error_broken():
+    my_functions.divide(number_one=4,number_two=0)
+```
+![test](./img/test8.png)
+
+- ## Parametrize
+Es un decorador que se utiliza para parametrizar pruebas, lo que significa que te permite ejecutar una misma prueba
+con diferentes conjutnso de datos de entrada y esperar resultaados. Esto es especialmente útli cuando tienes una serie 
+de pruebas que siguen un patrón similar, pero se deben probar con diferentes valores.
+
+Vamos a usar los archivos `shape.py` y `test_square.py`.
+- Al archivo `shape.py` le vamos a añadir una nueva clase.
+```
+class Square(Rectangle):
+
+    def __init__(self,side_lenght):
+        super().__init__(side_lenght,side_lenght)
+```
+- Y creamos el archivo `test_square.py`. La lista de tuplas proporciona diferentes valores de entrada `(side_length)` y
+los resultados esperados `(expected_area)`, se ejecutará la prueba para cada conjunto de datos proporcionando y
+comprobará si el resultado coincide con el valor esperado.
+```
+import pytest
+import source.shapes as shapes
+
+
+@pytest.mark.parametrize("side_length, expected_area", [(5, 25), (4, 16), (9, 81)])
+def test_multiple_square_areas(side_length, expected_area):
+    assert shapes.Square(side_length).area() == expected_area
+```
+
+![test](./img/test9.png)
+
+Como podemos ver hay 3 puntos que son las tres tuplas que hemos evaluado.
