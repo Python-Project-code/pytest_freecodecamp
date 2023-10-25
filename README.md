@@ -200,3 +200,25 @@ def test_perimeter(my_rectangle):
 
 ```
 
+
+Para no tener muchas fixtures vamos a crear un archivo llamado `conftest.py` donde vamos a definir nuestros rectángulos.
+Quitando las líneas de `test_rectagle.py` y añadiéndolas al `conftest.py`.
+
+```
+@pytest.fixture
+def my_rectangle():
+    return shapes.Rectangle(length=10, width=20)
+
+
+@pytest.fixture
+def weird_rectangle():
+    return shapes.Rectangle(length=5, width=6)
+
+```
+Ejecutamos el y pasa correctamente  ya que las fixtures son globales. Para probar esto, añadimos a `test_circle.py`:
+```
+    def test_not_same_area_rectangle(self,my_rectangle):
+        assert self.circle.area() != my_rectangle.area()
+
+```
+Y comrpobamos que sin añadar nada más la ejecución es correcta.
