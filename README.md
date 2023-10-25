@@ -389,3 +389,10 @@ def test_get_users(mock_get):
     assert data == {"id": 1, "name": "John Doe"}
 
 ```
+<a name="schema7"></a>
+
+# 7. Recursos
+
+
+https://www.youtube.com/watch?v=cHYq1MRoyI0
+
